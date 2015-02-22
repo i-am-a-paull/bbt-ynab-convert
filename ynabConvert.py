@@ -3,15 +3,15 @@ import csv
 def repr_data(hdr, data):
   return ', '.join('%s: %s' % (col, val) for col, val in zip(hdr,data))
 
-BANK_HDR = ['Date', 
-            'Transaction Type', 
-            'Check Number', 
-            'Description', 
+BANK_HDR = ['Date',
+            'Transaction Type',
+            'Check Number',
+            'Description',
             'Amount']
 
 class BankTransaction(object):
   """Transaction as read from the BB&T CSV file"""
-  
+
   def __init__(self, row):
     self.date = row[0]
     self.txType = row[1]
@@ -24,21 +24,20 @@ class BankTransaction(object):
     else:
       self.amt = amtTxt[1:]
 
-    self.data = [self.date, 
-                 self.txType, 
-                 self.chkNm, 
-                 self.desc, 
+    self.data = [self.date,
+                 self.txType,
+                 self.chkNm,
+                 self.desc,
                  self.amt]
 
   def __repr__(self):
     return repr_data(BANK_HDR, self.data)
 
-YNAB_HDR = ['Date', 
-            'Check', 
-            'Payee', 
-            'Category', 
-            'Memo', 
-            'Outflow', 
+YNAB_HDR = ['Date',
+            'Payee',
+            'Category',
+            'Memo',
+            'Outflow',
             'Inflow']
 
 class YnabTransaction(object):
@@ -46,11 +45,10 @@ class YnabTransaction(object):
 
   def __init__(self, bank_tx):
     self.date = bank_tx.date
-    self.check = bank_tx.chkNm
     self.payee = bank_tx.desc
     self.category = None
     self.memo = None
-    
+
     self.inflow = None
     self.outflow = None
     if bank_tx.amt.startswith('-'):
@@ -58,12 +56,11 @@ class YnabTransaction(object):
     else:
       self.inflow = bank_tx.amt
 
-    self.data = [self.date, 
-                 self.check, 
-                 self.payee, 
-                 self.category, 
-                 self.memo, 
-                 self.outflow, 
+    self.data = [self.date,
+                 self.payee,
+                 self.category,
+                 self.memo,
+                 self.outflow,
                  self.inflow]
 
   def __repr__(self):
@@ -72,9 +69,13 @@ class YnabTransaction(object):
 
 if __name__ == '__main__':
   hdr_written = False
+
+  # TODO  read arguments from cmdline, if present, handle absent file
   writer = csv.writer(open('ynabImport.csv', 'w'))
 
+  # TOOD read arg from command line if present, handle absent file
   reader = csv.reader(open('EXPORT.CSV', 'r'))
+
   for row in reader:
     if not hdr_written:
       writer.writerow(YNAB_HDR)
