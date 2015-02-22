@@ -1,4 +1,6 @@
+from optparse import OptionParser
 import csv
+import sys
 
 def repr_data(hdr, data):
   return ', '.join('%s: %s' % (col, val) for col, val in zip(hdr,data))
@@ -70,11 +72,22 @@ class YnabTransaction(object):
 if __name__ == '__main__':
   hdr_written = False
 
-  # TODO  read arguments from cmdline, if present, handle absent file
-  writer = csv.writer(open('ynabImport.csv', 'w'))
+  # Defaults
+  inputFile = 'EXPORT.CSV'
+  outputFile = 'ynabImport.csv'
 
-  # TOOD read arg from command line if present, handle absent file
-  reader = csv.reader(open('EXPORT.CSV', 'r'))
+  parser = OptionParser(usage="usage: %prog [inputFile] [[outputFile]] ")
+  (args, unparsed_args) = parser.parse_args(sys.argv[1:])
+
+  # Read input file as first command line arg, if one is present, if 2 args given, it is input and output file
+  if len(unparsed_args) > 0:
+    inputFile = unparsed_args[0]
+
+  if len(sys.argv[1:]) > 1:
+    outputFile = unparsed_args[1]
+
+  reader = csv.reader(open(inputFile, 'r'))
+  writer = csv.writer(open(outputFile, 'w'))
 
   for row in reader:
     if not hdr_written:
